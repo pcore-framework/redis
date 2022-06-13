@@ -1,6 +1,7 @@
 {
     "name": "pcore/redis",
     "type": "library",
+    "license": "MIT",
     "homepage": "https://github.com/pcore-framework/redis",
     "authors": [
         {

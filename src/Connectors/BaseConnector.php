@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace PCore\Redis\Connectors;
 
 use PCore\Redis\Contracts\ConnectorInterface;
-use PCore\Redis\Redis;
 use PCore\Redis\RedisConfig;
 
 /**

@@ -21,6 +21,7 @@ class AutoConnector implements ConnectorInterface
         'pool' => PoolConnector::class,
         'base' => BaseConnector::class
     ];
+
     protected ?ArrayObject $pool = null;
 
     public function __construct(protected RedisConfig $config)

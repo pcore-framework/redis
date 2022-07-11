@@ -20,7 +20,9 @@ class Redis
     }
 
     /**
-     * @throws \RedisException
+     * @param string $name
+     * @param array $arguments
+     * @return mixed
      */
     public function __call(string $name, array $arguments)
     {

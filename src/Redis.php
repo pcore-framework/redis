@@ -2,7 +2,9 @@
 
 namespace PCore\Redis;
 
+use Closure;
 use PCore\Redis\Contracts\ConnectorInterface;
+use Throwable;
 
 /**
  * Class Redis
@@ -12,26 +14,43 @@ use PCore\Redis\Contracts\ConnectorInterface;
 class Redis
 {
 
-    protected \Redis $redis;
-
-    public function __construct(protected ConnectorInterface $connector)
+    public function __construct(
+        protected ConnectorInterface $connector
+    )
     {
-        $this->redis = $this->connector->get();
+    }
+
+    public function __call(string $name, array $arguments)
+    {
+        return $this->connector->get()->{$name}(...$arguments);
     }
 
     /**
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
+     * @param null|mixed $redis
+     * @throws Throwable
      */
-    public function __call(string $name, array $arguments)
+    public function wrap(Closure $wrapper, $redis = null)
     {
-        return $this->redis->{$name}(...$arguments);
+        return $wrapper($redis ?? $this->connector->get());
     }
 
-    public function __destruct()
+    /**
+     * @throws Throwable
+     */
+    public function multi(Closure $wrapper, int $mode = \Redis::MULTI)
     {
-        $this->connector->release($this->redis);
+        return $this->wrap(function ($redis) use ($wrapper, $mode) {
+            try {
+                /* @var \Redis $redis */
+                $redis->multi($mode);
+                $result = $wrapper($redis);
+                $redis->exec();
+                return $result;
+            } catch (Throwable $throwable) {
+                $redis->discard();
+                throw $throwable;
+            }
+        });
     }
 
 }

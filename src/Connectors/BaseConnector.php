@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PCore\Redis\Connectors;
 
 use PCore\Redis\Contracts\ConnectorInterface;
+use PCore\Redis\RedisProxy;
 
 /**
  * Class BaseConnector
@@ -24,7 +25,7 @@ class BaseConnector implements ConnectorInterface
         protected int $retryInterval = 0,
         protected float $readTimeout = 0.0,
         protected string $auth = '',
-        protected int $database = 0,
+        protected int $database = 0
     )
     {
         $this->queue = new \SplPriorityQueue();
@@ -43,7 +44,7 @@ class BaseConnector implements ConnectorInterface
         );
         $redis->select($this->database);
         $this->auth && $redis->auth($this->auth);
-        return $redis;
+        return new RedisProxy($this, $redis);
     }
 
     public function release($redis)
